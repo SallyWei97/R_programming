@@ -124,4 +124,34 @@ apprpos("sum",mod="function")
 
 RsiteSearch()
 # 官网查询关键字
+# 可使用rseek.org网站，需要vpn
+
+# 数据通常行是观测值，列是变量值
+
+# P15 内置数据集 --------------------------------------------------------------
+
+# 内置数据集都存在datasets包
+data()
+#  输出所有包含的数据集
+rivers
+eg. 内置数据集-北美河流长度
+data("")
+#  输出选定数据集 eg. data("rivers")
+
+# 网盘有数据集整理
+class()
+# 查看数据集的类型(向量、因子、矩阵等
+
+heatmap()
+# 绘制数据集的热力图 eg. heatmap(volcano)
+
+data(package=.packages(all.available=TRUE))
+# 查找所有可用数据集
+
+data.frame()
+# 制作数据框
+
+data(database,package="程序包"）
+# 只加载拓展包里面的数据集，忽略包
+
 
