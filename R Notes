@@ -75,14 +75,53 @@ save.image()
     # eg. install.packages(c("a", "b", "c"))
 # - 离线（源代码）
 #   镜像站点下载源代码
-#   需要注意包之间的依赖关系
+#   需要注意包之间的依赖关系（通常推荐在线安装）
 
 require()
 # 加载包（eg. require(vcd)）
+library()
+# 加载包
+# library和require都可以载入包，但二者存在区别。
+# 一个函数中，如果一个包不存在，执行到library将会停止执行，require则会继续执行
+
+help(package="")
+# 查询该包的指南(eg. help(package="vcd"))
+library(help="")
+# 查询包的基础信息，如数据集(eg. library(help=""))
+# eg. Baseball (vcd自带数据集）
 
 detach() # eg. detach("package:vcd")
+# 从内存内移除，重新require即可使用
 remove.packages() # eg. remove.packages("vcd")
-# 去除包
+# 彻底删除包
 
 installed.packages()
-# 可用于拓展包移植，比如：
+# 可用于拓展包移植，
+# eg. 
+Rpack <- installed.packages()[,1]
+# 创建变量Rpack，为当前所有已安装包的名称（第一列）
+save(Rpack,file="Rpack.Rdata")
+# 保存变量Rpack
+load("C:/Users/three/Documents/Rpack.Rdata")
+# 加载该变量（需要移植的新电脑）
+Rpack
+# 查看该变量（需要移植的新电脑）
+for (x in Rpack) install.packages(x)
+# 使用循环来安装Rpack中所有包（需要移植的新电脑）
+
+# ?函数名（一个问号查函数）eg. 
+?mean
+# example（）查看函数的example eg.
+example(mean)
+# vignette() 查看包的说明(部分包没有该格式的intro） eg.
+vignette("xts")
+# ??函数名（两个问好查拓展包）eg. ??heatmap
+
+apropos()
+# 查询括号内的关键字 eg.
+apprpos("sum",mod="function")
+# 查询关键字为sum的函数
+
+RsiteSearch()
+# 官网查询关键字
+
