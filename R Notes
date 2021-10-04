@@ -1,0 +1,88 @@
+# Introduction to R programming language and data analysis----------------------
+# Creater: Wei Zheng
+# This note is created based on a video, Introduction to R programming language 
+# and data analysis, on the website of Bilibili (id: 基因学院).
+
+# P1-6    Introduction of R-----------------------------------------------------
+
+getwd()
+# 看路径
+setwd(dir="")
+修改保存路径
+
+df <- read.table("dataname.cvs", sep=",", header = T)
+# df将数据文件命名
+# read.table()读写Excel数据文件
+# sep=","来表示空格用字符
+
+table(df$supp, df$dose)
+# table()用于制作新表格，$用于统计总量
+# aggregate()测量均值、方差等
+
+# 内置数据集 粉色
+# 数据框 表格图案
+# 函数 蓝色
+# tab键自动补齐（第一个）
+
+# 快捷键
+# Ctrl+↑，调出历史记录（可输入条件后再执行，即可查找符合条件的历史记录
+# ESC中断当前操作
+# Alt+shift+k，调出所有快捷操作
+
+
+# P7-14   R的安装--------------------------------------------------------------
+
+# - 用 "<-" 赋值给一个局部变量，不建议使用=
+# - 用 "<<-" 赋值给一个全局变量
+# - "<-"的快捷键：alt + - 
+
+mean()
+# mean(1:5) -> 3 求1-5的平均数
+# mean(1,2,3,4,5) -> 1 只输出第一个向量（1）的平均数，后面为无效输入
+# mean(c(1,2,3,4,5)) -> 3 增加的c()帮助识别一串数字
+
+ls()
+# 列出所有变量
+
+ls.str()
+# 列出所有变量的详细信息
+
+str()
+# 括号里填写变量名，输出变量的信息
+
+rm()
+# 清除某个变量
+
+rm(list = ls())
+# 消除所有变量
+
+history()
+# 唤出历史
+
+# 清空界面快捷键 Ctrl+L
+
+
+save.image()
+# 保存工作空间（图片不会自动保存）
+
+# R拓展包安装
+# - 在线
+#   通过访问镜像站点
+#   拓展包的名字都需要被引号
+    install.package()
+    # eg. install.package("vcd")
+    install.packages()
+    # eg. install.packages(c("a", "b", "c"))
+# - 离线（源代码）
+#   镜像站点下载源代码
+#   需要注意包之间的依赖关系
+
+require()
+# 加载包（eg. require(vcd)）
+
+detach() # eg. detach("package:vcd")
+remove.packages() # eg. remove.packages("vcd")
+# 去除包
+
+installed.packages()
+# 可用于拓展包移植，比如：
