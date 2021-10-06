@@ -339,3 +339,12 @@ In x + z : longer object length is not a multiple of shorter object length
 > floor(c(1.22,2.33))
 [1] 1 2
 # 向下取整
+> trunc(c(1.22,2.33))
+[1] 1 2
+# 去除小数点
+> round(c(1.21,2.88,2.18),digits = 1)
+[1] 1.2 2.9 2.2
+> signif(c(1.21,2.88,2.18),digits=1)
+[1] 1 3 2
+# 四舍五入 round：digits为小数点后几位。
+
