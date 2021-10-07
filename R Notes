@@ -157,7 +157,7 @@ data(database,package="程序包"）
 # P16-26  编程基础概念---------------------------------------
 
 # 数据类型
-# 数值，字符串，逻辑型（布尔），日期型
+# 数值，，逻辑型（布尔），日期型
 
 # 对象
 # eg. 常量，数据结构，函数，图形
@@ -562,7 +562,7 @@ C3  3  8 13 18
 C4  4  9 14 19
 C5  5 10 15 20
 
-3. 列表
+3. 列表 --------------------------------------------------
 # 列表是对象的集合，可以是任何数据结构，甚至列表本身
 
 3.1 创建列表
@@ -654,3 +654,173 @@ mlist[[5]] <- iris
 > mlist <- mlist[-5]
 > mlist[[4]] <- NULL
 # 删除对象
+
+4.数据框 --------------------------------------------------
+# 类似spss数据集，矩形结构，列必须命名
+# 数据可以不是同一种数据类型（字符串，数值，逻辑值等）
+# 每一列必须是同一种数据类型
+
+4.1 创建数据框
+state <- data.frame(state.area,state.name,state.region)
+> state
+   state.area     state.name  state.region
+1       51609        Alabama         South
+2      589757         Alaska          West
+3      113909        Arizona          West
+4       53104       Arkansas         South
+5      158693     California          West
+6      104247       Colorado          West
+7        5009    Connecticut     Northeast
+8        2057       Delaware         South
+9       58560        Florida         South
+10      58876        Georgia         South
+11       6450         Hawaii          West
+12      83557          Idaho          West
+13      56400       Illinois North Central
+14      36291        Indiana North Central
+15      56290           Iowa North Central
+16      82264         Kansas North Central
+17      40395       Kentucky         South
+18      48523      Louisiana         South
+19      33215          Maine     Northeast
+20      10577       Maryland         South
+21       8257  Massachusetts     Northeast
+22      58216       Michigan North Central
+23      84068      Minnesota North Central
+24      47716    Mississippi         South
+25      69686       Missouri North Central
+26     147138        Montana          West
+27      77227       Nebraska North Central
+28     110540         Nevada          West
+29       9304  New Hampshire     Northeast
+30       7836     New Jersey     Northeast
+31     121666     New Mexico          West
+32      49576       New York     Northeast
+33      52586 North Carolina         South
+34      70665   North Dakota North Central
+35      41222           Ohio North Central
+36      69919       Oklahoma         South
+37      96981         Oregon          West
+38      45333   Pennsylvania     Northeast
+39       1214   Rhode Island     Northeast
+40      31055 South Carolina         South
+41      77047   South Dakota North Central
+42      42244      Tennessee         South
+43     267339          Texas         South
+44      84916           Utah          West
+45       9609        Vermont     Northeast
+46      40815       Virginia         South
+47      68192     Washington          West
+48      24181  West Virginia         South
+49      56154      Wisconsin North Central
+50      97914        Wyoming          West
+
+4.2 数据框访问
+# 索引访问
+# 名称访问（行列名）
+# $访问
+plot(women$height,women$weight) # 绘制散点图
+lm(weight ~ height,data=women)
+
+Call:
+lm(formula = weight ~ height, data = women) # 线性回归
+
+Coefficients:
+(Intercept)       height  
+     -87.52         3.45  
+     
+# attach加载数据框到R搜索目录
+> attach(mtcars)
+> disp
+ [1] 160.0 160.0 108.0 258.0 360.0 225.0 360.0 146.7 140.8 167.6 167.6 275.8 275.8 275.8 472.0
+[16] 460.0 440.0  78.7  75.7  71.1 120.1 318.0 304.0 350.0 400.0  79.0 120.3  95.1 351.0 145.0
+[31] 301.0 121.0
+# detach取消加载
+
+# with查询
+> with(mtcars,{mpg})
+ [1] 21.0 21.0 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 17.8 16.4 17.3 15.2 10.4 10.4 14.7 32.4
+[19] 30.4 33.9 21.5 15.5 15.2 13.3 19.2 27.3 26.0 30.4 15.8 19.7 15.0 21.4
+
+5. 因子 --------------------------------------------------
+# 名义型变量
+# 有序型变量 （good,better,best）
+# 连续型变量
+
+# 水平值=变量可能的值（除连续型）
+# 因子=水平值组成的向量
+
+# 主要用于主成分分析，因子分析，方差分析等
+
+5.1 创建因子
+> week <- factor(c("Mon","Tue","Fri"))
+> week
+[1] Mon Tue Fri
+Levels: Fri Mon Tue
+> week <- factor(c("Mon","Tue","Fri"),ordered = T, levels = c("Mon","Tue","Fri"))
+> week
+[1] Mon Tue Fri
+Levels: Mon < Tue < Fri
+# ordered=T,按levels顺序排序
+
+> fcyl <- factor(mtcars$cyl)
+> fcyl
+ [1] 6 6 4 6 8 6 8 4 4 6 6 8 8 8 8 8 8 4 4 4 4 8 8 8 8 4 4 4 8 6 8 4
+Levels: 4 6 8
+> plot(fcyl)
+# 绘制的是频率条形图而非散点图
+
+5.2 分割连续型变量
+> cut(x = num,breaks = c(seq(0,100,20)))
+  [1] (0,20]   (0,20]   (0,20]   (0,20]   (0,20]   (0,20]   (0,20]   (0,20]   (0,20]  
+ [10] (0,20]   (0,20]   (0,20]   (0,20]   (0,20]   (0,20]   (0,20]   (0,20]   (0,20]  
+ [19] (0,20]   (0,20]   (20,40]  (20,40]  (20,40]  (20,40]  (20,40]  (20,40]  (20,40] 
+ [28] (20,40]  (20,40]  (20,40]  (20,40]  (20,40]  (20,40]  (20,40]  (20,40]  (20,40] 
+ [37] (20,40]  (20,40]  (20,40]  (20,40]  (40,60]  (40,60]  (40,60]  (40,60]  (40,60] 
+ [46] (40,60]  (40,60]  (40,60]  (40,60]  (40,60]  (40,60]  (40,60]  (40,60]  (40,60] 
+ [55] (40,60]  (40,60]  (40,60]  (40,60]  (40,60]  (40,60]  (60,80]  (60,80]  (60,80] 
+ [64] (60,80]  (60,80]  (60,80]  (60,80]  (60,80]  (60,80]  (60,80]  (60,80]  (60,80] 
+ [73] (60,80]  (60,80]  (60,80]  (60,80]  (60,80]  (60,80]  (60,80]  (60,80]  (80,100]
+ [82] (80,100] (80,100] (80,100] (80,100] (80,100] (80,100] (80,100] (80,100] (80,100]
+ [91] (80,100] (80,100] (80,100] (80,100] (80,100] (80,100] (80,100] (80,100] (80,100]
+[100] (80,100]
+Levels: (0,20] (20,40] (40,60] (60,80] (80,100]
+# breaks:分割方式，可以是向量，数值
+
+6. 缺失数据 --------------------------------------------------
+6.1 简单处理
+> a <- c(1,NA,2:9)
+> sum(a)
+[1] NA
+> sum(a,na.rm = TRUE)
+[1] 45
+> mean(a,na.rm = TRUE)
+[1] 5
+# 使用na.rm移除NA
+
+> is.na(a)
+ [1] FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+# 使用is.na判断是否有缺失值
+
+> sum(is.na(sleep))
+[1] 38
+# 统计缺失值个数
+
+> c <- c(1,NA,NA,2:8)
+> c
+ [1]  1 NA NA  2  3  4  5  6  7  8
+> d <- na.omit(c)
+> d
+[1] 1 2 3 4 5 6 7 8
+attr(,"na.action")
+[1] 2 3
+attr(,"class")
+[1] "omit"
+# omit函数去除缺失值
+# omit去除数据框的缺失值会删除整行（观测值）
+
+6.2 处理缺失值包
+# 识别：VIM包
+# 删除：行删除omit.na; 配对删除：部分函数有可用选项
+# 最大似然估计：mvmle包
+# 插补：单个插补：Hmisc包; 多重插补：Mi包，Mice包，
