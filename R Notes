@@ -154,7 +154,7 @@ data.frame()
 data(database,package="程序包"）
 # 只加载拓展包里面的数据集，忽略包
 
-# P16-26  编程基础概念---------------------------------------
+# P16-26  编程基础概念----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # 数据类型
 # 数值，，逻辑型（布尔），日期型
@@ -823,4 +823,38 @@ attr(,"class")
 # 识别：VIM包
 # 删除：行删除omit.na; 配对删除：部分函数有可用选项
 # 最大似然估计：mvmle包
-# 插补：单个插补：Hmisc包; 多重插补：Mi包，Mice包，
+# 插补：单个插补：Hmisc包; 多重插补：Mi包，Mice包，amelia包，mitools包
+
+# NaN 不可能的值
+# Inf 无穷
+is.nan()
+is.infinite()
+
+7. 字符串
+
+7.1 简单处理
+> nchar("hello world")
+[1] 11
+# 计算长度
+length()
+# 计算向量中元素个数
+
+> paste("I","Love","China")
+[1] "I Love China"
+> paste("I","Love","China",sep="-")
+[1] "I-Love-China"
+> a1 <- c("Amy","Sally")
+> paste(a1,"likes rainbow")
+[1] "Amy likes rainbow"   "Sally likes rainbow"
+# 合并字符串，sep是分隔符，向量与字符串会挨个合并
+
+> substr(x = month.name,start = 1,stop = 3)
+ [1] "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
+# 提取字符串
+
+toupper()
+# 大写字符串
+tolower()
+# 小写字符串
+
+7.2 特殊处理（正则表达式）
