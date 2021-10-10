@@ -1,0 +1,37 @@
+# week2
+# compulsary exercise
+summary(shipman)
+summary(shipman$age)
+describe(shipman$age)
+table(shipman$decision)
+prop.table(table(shipman$decision))
+fre(shipman$decision)
+killed <- subset(shipman, decision %in% c("Conviction", "Unlawful killing"))
+killed
+describe(killed$age)
+hist(killed$age)
+hist(killed$age,xlab = "Age",main = "Age Distribution of Patients Killed by Dr. Shipman")
+hist(killed$year.died, xlab = "Year",
+     main = "Year Distribution of Patients Killed by Dr. Shipman")
+killed$name
+p_load(devtools)
+install.packages("devtools")
+devtools::install_github("kalimu/genderizeR")
+pacman::p_load(genderizeR)
+killed$first.name <- sub(" .*", "", killed$name)
+gender <- genderize(killed$first.name,genderDB=findGivenNames(killed$first.name))
+
+# optional exercise
+library(readr)
+turnout <- read_csv("R studio/turnout.csv")
+head(turnout)
+summary(turnout)
+summary(turnout$total)
+table(turnout$year)
+turnout$VAP.tr <- turnout$total / (turnout$VAP + turnout$overseas)
+summary(turnout$VAP.tr)
+turnout$VAP.tr <- turnout$total /
+  (turnout$VAP + turnout$overseas) * 100 # 百分比投票率
+summary(turnout$VAP.tr)
+turnout$VAP.diff <- turnout$ANES - turnout$VAP.tr # Q3.VAP.tr和ANES的投票率差异
+summary(turnout$VAP.diff) 
