@@ -911,7 +911,7 @@ sales <- round(runif(n = 48,min = 50,max = 100))
 ts(sales,start = c(2010,5),end = c(2011,4),frequency = 12)
 # ts函数生成时序
 
-9. 获取数据
+9. 读取数据
 
 patientID <- c(1:4)
 admdate <- c("10/15/2019","10/18/2019","10/21/2019","10/24/2019")
@@ -928,3 +928,34 @@ data2 <- edit(data2)
 install.packages("RODBC")
 library(RODBC)
 
+turnout <- read.csv("C:/Users/three/Desktop/turnout.csv")
+head（turnout） # 读取前6行
+
+x <- read.table("input.txt") # 默认空白分割
+x <- read.table("input.csv", sep=",", header = T, skip = 5, nrows = 100, 
+                    na.strings = " ") 
+# 逗号分割
+# 第一行是否为变量名称
+# skip的行数
+# nrows：总共导入多少行
+# 自动转化缺失值
+    
+read.csv() # 读取csv文件
+read.fwf() # fixed width file（固定位置（宽度）的文件）
+    
+x <- read.table("website", header = T) # 读取网络文件
+    
+install.packages("XML") # 网络读取数据的包
+readHTMLTable
+    
+install.packages("foreign") # 读取不同软件格式的数据的包，支持spss SAS等软件的格式
+help(package = "foreign")
+    
+# Excel直接复制到剪贴板导入
+x <- read.table("clipboard", header = T, sep = "\t") # Windows
+x <- read.table(pipe("pbpaste")) # Mac
+    
+read.table(gzfile("input.txt.gz")) # gz file
+    
+?readLines
+readLines("input.csv", n = 5) # n = 返回行数
