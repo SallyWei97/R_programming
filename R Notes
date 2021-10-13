@@ -891,6 +891,15 @@ tolower()
 temp <- tolower(month.name)
 gsub("^(\\w)","\\U\\1",temp,perl = T)
 
+# 分割字符串
+strsplit(字符串向量/集, "分隔符") 
+
+# 向量笛卡尔积
+A <- 1:3
+B <- c("A","B","C")
+outer(A,B,FUN = paste)
+
+
 8. 时间序列 -------------------------------------------------------------------------------------------
 a <- as.Date("2021-10-13")
 # 生成时间格式数据
@@ -918,3 +927,4 @@ data2 <- edit(data2)
 # 读取数据库
 install.packages("RODBC")
 library(RODBC)
+
