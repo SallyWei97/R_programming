@@ -911,7 +911,7 @@ sales <- round(runif(n = 48,min = 50,max = 100))
 ts(sales,start = c(2010,5),end = c(2011,4),frequency = 12)
 # ts函数生成时序
 
-9. 读取数据
+9. 读取数据 ---------------------------------------------------------------------------------------------------------
 
 patientID <- c(1:4)
 admdate <- c("10/15/2019","10/18/2019","10/21/2019","10/24/2019")
@@ -955,7 +955,39 @@ help(package = "foreign")
 x <- read.table("clipboard", header = T, sep = "\t") # Windows
 x <- read.table(pipe("pbpaste")) # Mac
     
-read.table(gzfile("input.txt.gz")) # gz file
+read.table(gzfile("input.txt.gz")) # 读取压缩文件
     
 ?readLines
-readLines("input.csv", n = 5) # n = 返回行数
+readLines("input.csv", n = 5) # n = 返回行数，常用于非常规文件，返回结果为字符串格式
+
+?scan
+scan(file,what) # file=文件地址，what指定读取数据类型(字符/文本等)
+
+10. 写入数据 ----------------------------------------------------------------------------------------------------
+?write
+    write.table(x, file = "x.txt")
+    write.table(x, file = "x.csv", sep = "\t", quote = F, append = F, 
+                na = "NA", row.names = F)
+    # append = F清空源文件（T加在原文件后）
+    # quote = F不为字符串添加""
+    # row.names = F取消自动添加的行号
+    # file= 改为gzfile("xxx")即可生成压缩文件
+# foreign包提供写入数据为其他软件格式的函数(部分)
+write.csv
+
+11. 读写Excel文件 ------------------------------------------------------------------------------------------------
+# Excel文件另存为csv格式
+    x <- read.csv()
+    
+# 复制剪贴板
+    x <- read.table(pipe("pbpaste"))
+    x <- read.table("clipboard",sep=\t,header=T)
+    
+# Excel的格式：.xlsx
+install.packages("readxl")
+library(readxl)
+read_excel()
+# 读取单页Excel
+library(openxlsx)
+readWorkbook()
+# 读取多sheet页Excel
