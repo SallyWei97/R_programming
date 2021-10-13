@@ -887,3 +887,24 @@ tolower()
 # 6. 后行断言 eg. (?<=我)喜欢只能匹配如"我喜欢你"中的"喜欢"
 
 # 处理首字母大写
+# 正则需要使用\\，因为R中\需要转义
+gsub
+
+8. 时间序列 -------------------------------------------------------------------------------------------
+
+9. 获取数据
+
+patientID <- c(1:4)
+admdate <- c("10/15/2019","10/18/2019","10/21/2019","10/24/2019")
+age <- c(round(runif(4,min = 20,max = 50)))
+diabetes <- c("Type1","Type2","Type3","Type4")
+status <- c("Poor","Improved","Excellent","Poor")
+data <- data.frame(patientID,admdate,age,diabetes,status)
+# 生成数据框
+data2 <- data.frame(patientID=character(),admdate=character(),age=numeric(),diabetes=character(),status=character())
+data2 <- edit(data2)
+# 进入编辑器
+
+# 读取数据库
+install.packages("RODBC")
+library(RODBC)
