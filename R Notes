@@ -991,3 +991,82 @@ read_excel()
 library(openxlsx)
 readWorkbook()
 # 读取多sheet页Excel
+
+12. 读写R文件
+saveRDS(iris,file = "iris.RDS")
+readRDS("iris.RDS")
+# RDS储存一个对象
+
+save(iris,iris3,file="C:/Users/three/test.RData")
+# RData就是保存时的工作空间，后缀是.RData
+# load RData文件时，相同名字的对象会覆盖之前的对象
+
+save.image()
+# 保存当前工作空间中的所有对象
+
+P 34-37 数据处理-数据转换
+
+1. 强制转换数据格式
+
+is.data.frame(state.x77)
+[1] FALSE
+state.x77 <- as.data.frame(state.x77)
+is.data.frame(state.x77)
+[1] TRUE
+# 矩阵转换为数据框
+
+as.matrix(data.frame(state.x77,state.name))
+# 数据框转化为矩阵（数字会变为字符）
+
+method(is)
+method(as)
+# 查看所有判断和转换函数
+
+x <- state.abb
+dim(x) <- c(5,10)
+# 为向量添加维度即可生成矩阵
+as.factor(x)
+# 向量转因子
+as.list(x)
+# 向量转列表
+unlist(list)
+# 列表转向量
+
+state <- data.frame(x,state.region,state.x77)
+y <- state["Nevada",]
+unname(y)
+# 去除y中的列名
+
+2. 提取部分数据
+
+who <- read.csv("R studio/WHO.csv")
+who1 <- who[c(1:20),c(1:10)]
+# 向量进行索引
+who2 <- who[which(who$Continent==7)]
+# which函数进行条件筛选
+who3 <- subset(who,who$CountryID<100 &who$CountryID>=50)
+# sbuset提取子集
+
+x <- 1:100
+sample(x,40,replace = T)
+who4 <- who[sample(who$CountryID,10),]
+# sample抽样函数，replac=T 有放回抽样
+
+3. 删除数据
+mtcars[-1:-10,]
+# 负索引删除
+mtcars$mpg <- NULL
+# 清空指定行/列
+
+4. 添加合并数据框
+data.frame(USArrests,state.division)
+cbind(USArrests,state.division)
+# 合并列
+data1 <- head(USArrests,20)
+data2 <- head(USArrests,20)
+rbind(data1,data2)
+# 合并行（列名需要一致）
+
+data1 <- head(USArrests,30)
+data2 <- head(USArrests,30)
+data4 <- rbind(data1,data2) # 此时有重复的行
