@@ -33,7 +33,64 @@ summary(turnout$VAP.tr) # VAP投票率
 turnout$VAP.tr <- turnout$total /
   (turnout$VAP + turnout$overseas) * 100 # 百分比投票率
 summary(turnout$VAP.tr)
+turnout$VAP.diff <- turnout$ANES - turnout$VAP.tr # Q3.VAP.tr和ANES的投票率差异
+summary(turnout$VAP.diff) 
+turnout.sub1 <- subset(turnout, year == 1980| year == 1984| year == 1988|year == 1992|year == 1996|year == 2000|year == 2004|year == 2008)
+turnout.sub11 <- subset(turnout, year == 1980| year == 1984| year == 1988|year == 1992|year == 1996|year == 2000|year == 2004)
+# 提取选举年的数据
+turnout.sub2 <- subset(turnout, year == 1982| year == 1986| year == 1990|year == 1994|year == 1998|year == 2002)
+turnout.sub22 <- subset(turnout, year == 1982| year == 1986| year == 1990|year == 1994|year == 1998)
+# 提取中间年的数据
 
+# 遗留问题：按条件提取的条件能否是向量？
+
+summary(turnout.sub1$ANES)
+summary(turnout.sub11$ANES)
+summary(turnout.sub2$ANES)
+summary(turnout.sub22$ANES)
+# Q4. 分析whether the self-reported bias from the ANES varies across election types
+# results：yes，bias of presidential elections is smaller
+
+turnout$VEP.tr <- turnout$total / (turnout$VEP + turnout$overseas) *100 # VEP投票率
+turnout$ANES.diff <- turnout$ANES - turnout$VEP.tr
+turnout.former <- subset(turnout, year ==1980 |year ==1982 |year ==1984 |year ==1986 |year ==1988 |year ==1990 |year ==1992)
+turnout.later <- subset(turnout, year == 1994 |year ==1996 |year ==1998 |year ==2000 |year ==2002 |year ==2004 |year ==2008)
+summary(turnout.former$ANES.diff)
+summary(turnout.later$ANES.diff)
+# Q5. Now has the bias of the ANES increased over time?
+# results: yes
+
+turnout$VAP.ad <- (turnout$total - turnout$osvoters) / (turnout$VAP - turnout$felons - turnout$noncit) *100
+turnout$VAP.ad[14];turnout$VAP.tr[14];turnout$VEP.tr[14];turnout$ANES[14]
+# Q6.  Compare the adjusted VAP turnout with the unadjusted VAP, VEP, and the ANES turnout rate
+# results: VAP.tr < VEP.tr < VAP.ad < ANES
+
+# 70151 week3
+# Example
+library(ggplot2)
+set.seed(34643) # 固定生成的随机数
+x<- 0:10
+fx <- dpois(x,2) # 泊松分布密度
+mass<-ggplot()+ geom_bar(mapping=aes(x=x, y=fx), stat="identity") + xlim(0,10) + ylim(0,0.4)
+# geom_bar 绘制柱状图；aes 映射函数；xlim/ylim xy轴长度
+mass
+
+# Exercise1
+set.seed(34643)
+rbinom(1,1,0.5)
+rbinom(100,1,0.5)
+
+# Exercise2 泊松分布直方图
+edf1 <- rpois(100,2) # 产生泊松分布的随机数
+edf2 <- rpois(100000,2)
+
+mass1 <- ggplot()+ geom_bar(aes(x = edf1,y = stat(count)/sum(count)))+ xlim(0,10) + ylim(0,0.4)
+mass1
+
+mass2 <- ggplot()+ geom_bar(aes(x = edf2,y = stat(count)/sum(count)))+ xlim(0,10) + ylim(0,0.4)
+mass2
+
+# 70011 week3
 # 70011 week3
 pacman::p_load(haven, expss, psych, sjPlot, tidyverse)
 load("~/R studio/70011/IAT.RData")
@@ -101,60 +158,3 @@ iat$sdo01 <- rescale01(iat$sdo, na.rm = TRUE)
 describe(iat$sdo01) # Check the summary statistics for SDO
 ## Check the correlation between SDO and D-score
 cor(iat$sdo01, iat$dscore, use = 'complete.obs')
-
-turnout$VAP.diff <- turnout$ANES - turnout$VAP.tr # Q3.VAP.tr和ANES的投票率差异
-summary(turnout$VAP.diff) 
-turnout.sub1 <- subset(turnout, year == 1980| year == 1984| year == 1988|year == 1992|year == 1996|year == 2000|year == 2004|year == 2008)
-turnout.sub11 <- subset(turnout, year == 1980| year == 1984| year == 1988|year == 1992|year == 1996|year == 2000|year == 2004)
-# 提取选举年的数据
-turnout.sub2 <- subset(turnout, year == 1982| year == 1986| year == 1990|year == 1994|year == 1998|year == 2002)
-turnout.sub22 <- subset(turnout, year == 1982| year == 1986| year == 1990|year == 1994|year == 1998)
-# 提取中间年的数据
-
-# 遗留问题：按条件提取的条件能否是向量？
-
-summary(turnout.sub1$ANES)
-summary(turnout.sub11$ANES)
-summary(turnout.sub2$ANES)
-summary(turnout.sub22$ANES)
-# Q4. 分析whether the self-reported bias from the ANES varies across election types
-# results：yes，bias of presidential elections is smaller
-
-turnout$VEP.tr <- turnout$total / (turnout$VEP + turnout$overseas) *100 # VEP投票率
-turnout$ANES.diff <- turnout$ANES - turnout$VEP.tr
-turnout.former <- subset(turnout, year ==1980 |year ==1982 |year ==1984 |year ==1986 |year ==1988 |year ==1990 |year ==1992)
-turnout.later <- subset(turnout, year == 1994 |year ==1996 |year ==1998 |year ==2000 |year ==2002 |year ==2004 |year ==2008)
-summary(turnout.former$ANES.diff)
-summary(turnout.later$ANES.diff)
-# Q5. Now has the bias of the ANES increased over time?
-# results: yes
-
-turnout$VAP.ad <- (turnout$total - turnout$osvoters) / (turnout$VAP - turnout$felons - turnout$noncit) *100
-turnout$VAP.ad[14];turnout$VAP.tr[14];turnout$VEP.tr[14];turnout$ANES[14]
-# Q6.  Compare the adjusted VAP turnout with the unadjusted VAP, VEP, and the ANES turnout rate
-# results: VAP.tr < VEP.tr < VAP.ad < ANES
-
-# 70151 week3
-# Example
-library(ggplot2)
-set.seed(34643) # 固定生成的随机数
-x<- 0:10
-fx <- dpois(x,2) # 泊松分布密度
-mass<-ggplot()+ geom_bar(mapping=aes(x=x, y=fx), stat="identity") + xlim(0,10) + ylim(0,0.4)
-# geom_bar 绘制柱状图；aes 映射函数；xlim/ylim xy轴长度
-mass
-
-# Exercise1
-set.seed(34643)
-rbinom(1,1,0.5)
-rbinom(100,1,0.5)
-
-# Exercise2 泊松分布直方图
-edf1 <- rpois(100,2) # 产生泊松分布的随机数
-edf2 <- rpois(100000,2)
-
-mass1 <- ggplot()+ geom_bar(aes(x = edf1,y = stat(count)/sum(count)))+ xlim(0,10) + ylim(0,0.4)
-mass1
-
-mass2 <- ggplot()+ geom_bar(aes(x = edf2,y = stat(count)/sum(count)))+ xlim(0,10) + ylim(0,0.4)
-mass2
