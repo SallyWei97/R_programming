@@ -33,6 +33,75 @@ summary(turnout$VAP.tr) # VAP投票率
 turnout$VAP.tr <- turnout$total /
   (turnout$VAP + turnout$overseas) * 100 # 百分比投票率
 summary(turnout$VAP.tr)
+
+# 70011 week3
+pacman::p_load(haven, expss, psych, sjPlot, tidyverse)
+load("~/R studio/70011/IAT.RData")
+glimpse(iat)
+view_df(iat) # 保存（或显示）导入的SPSS、SAS或Stata数据文件的内容，或任何类似的标记的data.frame，以HTML表格形式展现。
+fre(iat$year)
+round(prop.table(table(iat$year)),2) # 提取year并计算百分比，取两位小数
+hist(iat$year)
+describe(iat$dscore)
+# Q1
+dim(iat) # 查看有多少参与者在2004年和2019年之间完成了IAT？
+names(iat) # 查看这个数据框包含哪些变量
+glimpse(iat) # 查看变量名称,数量等
+view_df(iat) # 保存（或显示）导入的SPSS、SAS或Stata数据文件的内容，或任何类似的标记的data.frame，以HTML表格形式展现。
+fre(iat$year)
+hist(iat$year)
+
+# Q2
+describe(iat$dscore) # dscore的平均数
+
+# Q3
+# 密度图1
+fig1 <- ggplot(iat) + # Specify the data
+  geom_density(aes(dscore) ) # Specify the type of figure and variable to plot
+# geom_density: y轴显示的是 "核心密度"，或某一特定点的概率
+fig1
+# 密度图2
+fig1b <- ggplot(iat) +
+  geom_density(aes(dscore), color = "darkblue", fill = "lightblue") + # Add colour
+  geom_vline(aes(xintercept = mean(dscore)), # Add a vertical line for the y
+             colour = "black", # Make the line black
+             linetype = "dashed") + # And dashed
+  labs(title = "D-Score Distribution", x = "D-Score", y = "Density") # Add labels
+fig1b
+
+# Q4
+iat.ts <- iat %>% # 将数据传给下面的函数
+  group_by(year) %>%  # 按year分类
+  summarise(mean=mean(dscore)) # 确定取的平均数 %>%是什么意思？
+iat.ts
+fig2 <- ggplot(iat.ts) + # We're using the 'iat.ts' object, not the full 'iat' data frame
+  geom_line(aes(x = year, y = mean) )
+fig2
+fig2b <- ggplot(iat.ts) + # Using the 'iat.ts' object
+  geom_line(aes(x = year, y = mean), color = "darkblue" ) + # Add colour to the line
+  scale_y_continuous(limits = c(0, .4) ) + # Change the endpoints of the y-axis
+  labs(title = "Mean D-Score by Year", x = "Year", y = "D-Score") + # Add labels
+  theme_bw() # Change the theme to 'Black and White'
+fig2b # Print the figure
+
+# Q5
+## Create the SDO scale
+## List the items that comprise the SDO scale
+sdo.keys <- list(sdo = cs(jsdo1, jsdo2, jsdo3, jsdo4, jsdo5, jsdo6,
+                          jsdo7, -jsdo8, -jsdo9, -jsdo10, -jsdo11, -jsdo12) ) # cs()将文字列表转换为字符向量
+## Now create the SDO scale using the items identified above
+sdo.test <- scoreItems(sdo.keys, iat, min = 1, max = 6) # scoreItems:找出每个人和每个量表的总分或平均分
+## Check the newly created scales and retrieve the scale alpha
+## Add the new SDO variable to the 'iat' data
+iat$sdo <- sdo.test$scores
+## [rescale01] Function to rescale a variable from 0 to 1
+rescale01 <- function(x, ...) {(x - min(x, ...)) / ((max(x, ...)) - min(x, ...))} # （x-min）/(max-min)
+## Rescale SDO and store this as a new variable called 'sdo01'
+iat$sdo01 <- rescale01(iat$sdo, na.rm = TRUE)
+describe(iat$sdo01) # Check the summary statistics for SDO
+## Check the correlation between SDO and D-score
+cor(iat$sdo01, iat$dscore, use = 'complete.obs')
+
 turnout$VAP.diff <- turnout$ANES - turnout$VAP.tr # Q3.VAP.tr和ANES的投票率差异
 summary(turnout$VAP.diff) 
 turnout.sub1 <- subset(turnout, year == 1980| year == 1984| year == 1988|year == 1992|year == 1996|year == 2000|year == 2004|year == 2008)
