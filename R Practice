@@ -1,4 +1,4 @@
-# 70011 week2
+# 70011 week2 -----------------------------------------------------------------------------------------------------------------
 # compulsary exercise
 summary(shipman)
 summary(shipman$age)
@@ -65,7 +65,15 @@ turnout$VAP.ad[14];turnout$VAP.tr[14];turnout$VEP.tr[14];turnout$ANES[14]
 # Q6.  Compare the adjusted VAP turnout with the unadjusted VAP, VEP, and the ANES turnout rate
 # results: VAP.tr < VEP.tr < VAP.ad < ANES
 
-# 70151 week3
+# 70151 week3 -----------------------------------------------------------------------------------------------------------------
+# Q4
+# X~gamma(7,1)
+# (1)
+1-pgamma(5, shape = 7, rate = 1)
+# (2)
+pgamma(15, shape = 7, rate = 1)-pgamma(10, shape = 7, rate = 1)
+
+
 # Example
 library(ggplot2)
 set.seed(34643) # 固定生成的随机数
@@ -76,22 +84,29 @@ mass<-ggplot()+ geom_bar(mapping=aes(x=x, y=fx), stat="identity") + xlim(0,10) +
 mass
 
 # Exercise1
+set.seed(34643) # 固定生成的随机数
+x<- 0:10
+Fx <- ppois(x,2) # 泊松分布累积密度
+mass<-ggplot()+ geom_bar(mapping=aes(x=x, y=Fx), stat="identity") + xlim(0,10) + ylim(0,1)
+mass
+
 set.seed(34643)
 rbinom(1,1,0.5)
 rbinom(100,1,0.5)
 
-# Exercise2 泊松分布直方图
+# Exercise2
+set.seed(34643)
 edf1 <- rpois(100,2) # 产生泊松分布的随机数
+set.seed(34643)
 edf2 <- rpois(100000,2)
 
-mass1 <- ggplot()+ geom_bar(aes(x = edf1,y = stat(count)/sum(count)))+ xlim(0,10) + ylim(0,0.4)
+mass1 <- ggplot()+ geom_bar(aes(x = edf1,y = (..count..)/sum(..count..)))+ xlim(0,10) + ylim(0,0.4) # or stat(count)/sum(count)
 mass1
 
 mass2 <- ggplot()+ geom_bar(aes(x = edf2,y = stat(count)/sum(count)))+ xlim(0,10) + ylim(0,0.4)
 mass2
 
-# 70011 week3
-# 70011 week3
+# 70011 week3 -----------------------------------------------------------------------------------------------------------------
 pacman::p_load(haven, expss, psych, sjPlot, tidyverse)
 load("~/R studio/70011/IAT.RData")
 glimpse(iat)
