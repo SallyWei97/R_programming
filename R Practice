@@ -173,3 +173,36 @@ iat$sdo01 <- rescale01(iat$sdo, na.rm = TRUE)
 describe(iat$sdo01) # Check the summary statistics for SDO
 ## Check the correlation between SDO and D-score
 cor(iat$sdo01, iat$dscore, use = 'complete.obs')
+
+# 70151 week4 ----------------------------------------------------------------------------------------
+# Q1 geometric distribution
+dgeom(0,0.6)+dgeom(1,0.6)+dgeom(2,0.6)
+dgeom(3,0.6)+dgeom(4,0.6)
+
+# Q2 Normal distribution
+pnorm(q = 0.5)
+pnorm(0.75)-pnorm(-0.25)
+1-(pnorm(0.5)-pnorm(-0.5))
+
+# Q3 Normal distribution
+qnorm(0.75)
+qnorm(0.05)
+qnorm(0.65)
+qnorm(0.25)
+
+# Q4 Binomial distribution
+3*0.5
+3*0.5*(1-0.5)
+
+# Q5 Gamma distribution
+3/2
+3/(2*2)
+qgamma(p = 0.75,shape = 3,rate = 2)
+
+# Q6 
+Ex <- (-2)*0.1+(-1)*0.2+0*0.2+1*0.15+2*0.15+3*0.2
+Ex
+Vx <- (4*0.1+1*0.2+0*0.2+1*0.15+4*0.15+9*0.2)-(Ex*Ex)
+Vx
+3*Ex+2
+(4^2)*Vx
