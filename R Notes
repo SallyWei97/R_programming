@@ -1067,6 +1067,64 @@ data2 <- head(USArrests,20)
 rbind(data1,data2)
 # 合并行（列名需要一致）
 
+5. 剔除重复值
 data1 <- head(USArrests,30)
 data2 <- head(USArrests,30)
 data4 <- rbind(data1,data2) # 此时有重复的行
+duplicated(data4) # 判断重复值
+data4[!duplicated(data4),] # !表示剔除重复值（类似负索引）
+# 使用索引+duplicated
+rownames(data4[!duplicated(data4),])
+length(rownames(data4[!duplicated(data4),]))
+
+unique(data4)
+# 使用unique直接剔除
+
+6. 转置颠倒
+sractm <- t(mtcars) # 转置
+rev(letters) # 向量颠倒
+women[rev(rownames(women)),] # 行颠倒
+
+7. 数据加减
+women$height*2.54
+data.frame(women$height*2.54,women$weight)
+# 将height转换为cm为单位
+
+transform(women,height=height*2.54)
+transform(women,height.cm=height*2.54)
+# 使用transform进行转换
+
+8. 数据框的排序
+# sort 向量排序
+sort(rivers,decreasing = T) # 默认decreasing=F，从小到大
+mtcars[sort(rownames(mtcars)),] # 通过排序行，来对数据框排序
+order(rivers) # order返回向量的位置
+mtcars[order(mtcars$mpg),] # 排序数据框更方便，倒序可设置decreasing = T
+mtcars[order(mtcars$mpg,mtcars$disp),] # 多条件排序
+
+9. 数据框求和取均值及分类等
+worldPhones <- as.data.frame(WorldPhones)
+rs <- rowSums(worldPhones)
+cm <- colMeans(worldPhones)
+total <- cbind(worldPhones,total=rs)
+rbind(total,mean=cm)
+
+# apply系列函数
+
+# apply for dataframe, matrix
+apply(data, MARGIN = 1, FUN = sum()) # MARGIN = 1->行
+apply(data, MARGIN = 2, FUN = mean()) # MARGIN = 2->列
+
+# lapply for list
+lapply(list, FUN = length()) 
+
+# sapply for vector, matrix
+
+# tapply for factor
+tapply(state.name, state.division, FUN = length) # 第二个是因子，也是分类条件，length是求集合中元素的个数
+
+10. 数据中心化和标准化
+# 中心化 x-mean(x) center
+# 标准化 （x-mean()x）/sd(x) scale
+scale(x = state.x77,center = T,scale = T)
+heatmap(scale(x = state.x77,center = T,scale = T))
