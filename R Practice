@@ -206,3 +206,81 @@ Vx <- (4*0.1+1*0.2+0*0.2+1*0.15+4*0.15+9*0.2)-(Ex*Ex)
 Vx
 3*Ex+2
 (4^2)*Vx
+
+# optional exercise
+# example：gamma distribution
+# 1 模拟伽马分布再计算频率
+draws <- rgamma(10000, shape=2, rate=2)
+under3 <- draws <= 3 # 判断draws中各个数是否<=3，under3是一个逻辑值
+mean(under3)
+# 2 计算伽马分布的概率
+pgamma(3, shape=2, rate=2)
+# 3 计算模拟数的期望和方差
+mean(draws)
+var(draws)
+
+# practice1 Binomial
+bin <- rbinom(10000,size = 10,prob = 0.4) #模拟
+under5 <- bin <= 5
+mean(under5) #模拟频率
+pbinom(5,10,0.4) #概率
+mean(bin)
+10*0.4
+var(bin)
+10*0.4*0.6
+
+# practice2 geometric
+geo <- rgeom(n = 10000,prob = 0.4)
+under2 <- geo <= 2
+mean(under2)
+pgeom(q = 2,prob = 0.4)
+mean(geo) # 相差较大
+1/0.4
+var(geo)
+0.6/(0.4*0.4)
+
+# practice3 Poisson
+poi <- rpois(100000,0.6)
+under4 <- poi <= 4
+mean(under4)
+ppois(4,0.6)
+mean(poi)
+var(poi)
+
+# practice4 Uniform
+uni <- runif(n = 10000,min = 1,max = 5)
+below2 <- uni <= 2
+mean(below2)
+punif(2,min = 1,max = 5)
+mean(uni)
+(1+5)/2
+var(uni)
+(5-1)^2/12
+
+# practice5 Exponential
+exp <- rexp(10000,rate = 0.3)
+below3 <- exp <= 3
+mean(below3)
+pexp(3,0.3)
+mean(exp)
+1/0.3
+var(exp)
+1/(0.3*0.3)
+
+# practice6 Gamma
+gam <- rgamma(10000,shape = 2,rate = 7)
+below4 <- gam <= 0.4
+mean(below4)
+pgamma(0.4,shape = 2,rate = 7)
+mean(gam)
+2/7
+var(gam)
+2/(7*7)
+
+# practice7 Normal
+nor <- rnorm(10000)
+below1 <- nor <= 1
+mean(below1)
+pnorm(1)
+mean(nor)
+var(nor)
