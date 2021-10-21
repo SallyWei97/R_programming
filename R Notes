@@ -992,7 +992,7 @@ library(openxlsx)
 readWorkbook()
 # 读取多sheet页Excel
 
-12. 读写R文件
+12. 读写R文件 ------------------------------------------------------------------------------------------------
 saveRDS(iris,file = "iris.RDS")
 readRDS("iris.RDS")
 # RDS储存一个对象
@@ -1004,7 +1004,7 @@ save(iris,iris3,file="C:/Users/three/test.RData")
 save.image()
 # 保存当前工作空间中的所有对象
 
-P 34-37 数据处理-数据转换
+P 34-37 数据处理-数据转换 ------------------------------------------------------------------------------------------------
 
 1. 强制转换数据格式
 
@@ -1069,7 +1069,7 @@ rbind(data1,data2)
 
 5. 剔除重复值
 data1 <- head(USArrests,30)
-data2 <- head(USArrests,30)
+data2 <- tail(USArrests,30)
 data4 <- rbind(data1,data2) # 此时有重复的行
 duplicated(data4) # 判断重复值
 data4[!duplicated(data4),] # !表示剔除重复值（类似负索引）
@@ -1128,3 +1128,18 @@ tapply(state.name, state.division, FUN = length) # 第二个是因子，也是�
 # 标准化 （x-mean()x）/sd(x) scale
 scale(x = state.x77,center = T,scale = T)
 heatmap(scale(x = state.x77,center = T,scale = T))
+
+P38-40 reshape2，tidyr，dplyr ------------------------------------------------------------------------------------------------
+
+# merge 合并同类项
+x <- data.frame(k1=c(NA,NA,3,4,5),k2=c(1,NA,NA,4,5),data=1:5)
+y <- data.frame(k1=c(NA,2,NA,4,5),k2=c(NA,NA,3,4,5),data=1:5)
+merge(x,y,by = "k1")
+merge(x,y,by = "k2",incomparables = T) # NA的情况两两组合
+merge(x,y,by=c("k1","k2"))
+
+# reshape 揉数据
+melt(airquality) #融合数据，将宽数据变为长数据
+aql <- melt(airquality,id.vars = c("month","day")) #以月份+日期作为id
+aqw <- dcast(data = aql,formula = month+day~variable) # 长变宽：month+day作为id，variable列的各个factor作为新的列名
+aqw <- dcast(aql,formula = month ~variable,fun.aggregate = sum,na.rm=T) # 以month为id汇总，值为各个day的求和
