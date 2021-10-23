@@ -284,3 +284,145 @@ mean(below1)
 pnorm(1)
 mean(nor)
 var(nor)
+
+# 70011 week4 -------------------------------------------------------------------------------------------------------
+## practical
+```{r}
+library('tidyverse')
+library('expss')
+library('haven')
+library('psych')
+```
+
+1.
+```{r}
+chechen<- read.csv('chechen.csv')
+head(chechen)
+table(chechen$fire)
+fre(chechen$fire)
+```
+
+2.
+```{r}
+chechen.sub<-subset(chechen,groznyy==1)
+chechen.sub
+summary(chechen.sub$deaths)
+#summary(chechen$deaths[chechen$groznyy == 1]) #equivalent to the above
+#aggregate(deaths ~ groznyy, data = chechen, mean)  #using 'groznyy' variable to group 'deaths' variable,and finding mean
+#aggregate(deaths ~ groznyy, data = chechen, median)  #using 'groznyy' variable to group 'deaths' variable, and finding median
+chechen %>% group_by(groznyy) %>% 
+  summarise(mean = mean(deaths, na.rm = TRUE), 
+            median = median(deaths, na.rm = TRUE)) #  #using 'groznyy' variable to group 'deaths' variable, and dinginf mean $ median
+```
+
+3.
+```{r}
+bombed1<-subset(chechen,fire==1)
+nonbombed1<-subset(chechen,fire==0)
+mean(bombed1$postattack,na.rm = TRUE)-mean(nonbombed1$postattack,na.rm = TRUE)
+```
+
+4.
+```{r}
+bombed2<-subset(chechen,fire==1)
+nonbombed2<-subset(chechen,fire==0)
+mean(bombed2$preattack)-mean(nonbombed2$preattack)
+```
+
+5.
+```{r}
+chechen<-chechen%>% mutate(diffattack=chechen$postattack-chechen$preattack)
+bombed_diff<-subset(chechen,fire == 1)
+mean(bombed_diff$diffattack)
+```
+
+6.
+```{r}
+unbombed_diff<-subset(chechen,fire == 0)
+mean(bombed_diff$diffattack)-mean(unbombed_diff$diffattack)
+```
+
+## optional
+---
+title: "week 4 optional practice"
+author: "zheng wei"
+date: "2021/10/23"
+output: pdf_document
+---
+
+```{r}
+install.packages("plyr")
+library(plyr)
+install.packages("dplyr")
+library(dplyr)
+```
+
+1.1 success正则
+```{r}
+grepl("^dies",leaders$result)
+leaders$success <- ifelse(grepl("^dies",leaders$result) == "TRUE",1,0)
+```
+
+1.2 case_when
+```{r}
+install.packages("dplyr")
+library(dplyr)
+leaders <- leaders %>% mutate(success2= case_when(result=="not wounded"~0,
+                                              result=="dies within a day after the attack"~1,
+                                              result== "survives, whether wounded unknown"~0,
+                                              result=="wounded lightly" ~0,
+                                              result=="plot stopped"~0,
+                                              result=="hospitalization but no permanent disability"~0,
+                                              result=="dies between a day and a week"~1,
+                                              result=="dies, timing unknown" ~1,
+                                              result=="survives but wounded severely"~0,
+                                              result=="dies between a week and a month"  ~1))
+
+```
+
+2. polity z分数
+```{r}
+leaders$polity.pre <- (leaders$politybefore - min(leaders$politybefore)) / (max(leaders$politybefore) - min(leaders$politybefore))
+leaders$polity.pre
+leaders$polity.post <- (leaders$polityafter - min(leaders$polityafter)) / (max(leaders$polityafter) - min(leaders$polityafter))
+leaders$polity.post
+```
+
+3. difference in polity.post
+```{r}
+leaders %>% summarise(y = 
+                mean(polity.post[success==1])
+                -  mean(polity.post[success==0]))
+```
+4. 
+```{r}
+leaders %>% summarise(y = 
+                mean(polity.post[success==1])
+                -  mean(polity.pre[success==1]))
+```
+5. 
+```{r}
+leaders$polity.diff <- leaders$polity.post - leaders$polity.pre
+leaders %>% 
+  summarise(y = 
+              mean(polity.diff[success==1])
+                -  mean(polity.diff[success==0]))
+```
+6. 
+```{r}
+leaders$warafter <- 
+case_when(leaders$civilwarafter == 1 ~ 1,
+          leaders$interwarafter == 1 ~ 1,
+          TRUE ~ 0)
+leaders$warbefore <- 
+case_when(leaders$civilwarbefore == 1 ~ 1,
+          leaders$interwarbefore == 1 ~ 1,
+          TRUE ~ 0)
+leaders$war.diff <- leaders$warafter - leaders$warbefore
+leaders %>% 
+  summarise(y= mean(war.diff[success == 1]) - mean(war.diff[success == 0]))
+leaders %>% 
+  summarise(y= mean(war.diff[success == 1]))
+leaders %>% 
+  summarise(y= mean(war.diff[success == 0]))
+```
