@@ -1162,3 +1162,52 @@ df2 <- data.frame(x=c(NA,"a.b-c","a-c","b-a"))
 separate(df2,col = x,into = c("A","B"),sep="-") # 指定分隔符
 x <- separate(df2,col = x,into = c("A","B"),sep="-")
 unite(x,col = "AB", A,B,sep = "+") #指定连接符，合并
+
+3. dplyr
+# 剔除数据
+dplyr::filter(iris,Sepal.Length>7) #过滤掉不符合后面逻辑的行
+dplyr::distinct(rbind(data[1:10,], data[1:15,])) # distinct去掉重复的行
+
+# 抽取数据
+dplyr::slice(data, 10:15) # 取出数据指定行
+dplyr::sample_n(data, n) # 随机取出n行
+dplyr::sample_frac(data, 0.1) # 按比例随机取出行
+dplyr::slice_sample(data) # 随机取1行
+
+# 数据排序
+dplyr::arrange(data, c2) # 按照某一列的大小来排序（从小到大）
+dplyr::arrange(data, desc(c2)) # 按照某一列相反的大小来排序（从大到小）
+
+# 数据提取（变量）
+dplyr::select()
+
+# 数据统计
+summarise(data, avg = mean(c2))
+summarise(data, sum = sum(c2))
+
+# 链式操作符 %>%（管道）快捷键：Ctrl+shift+M
+# 相当于“然后”
+dplyr::group_by(data, c5) # 通过制定列的因子来进行分组，每一种因子为一组。
+data %>% group_by(c5) # 另一种写法
+data %>% group_by(c5) %>% summarise(avg = mean(c2)) %>% arrange((avg))
+# 先分组，再算平均值，再排序
+
+# 添加变量
+dplyr::mutate(data, new=c2+c3) # 加新的一列，并添加逻辑
+
+# 双表格合并
+a <- data.frame(x1 = c("A","B","C"), x2 = c(1,2,3))
+b <- data.frame(x1 = c("A","B","D"), x2 = c(T,F,T))
+dplyr::left_join(a,b,by="x1") # 左连接，x1以a为准
+dplyr::right_join(a,b,by="x1") # 右连接，x1以b为准
+dplyr::full_join(a, b, by="x1") # 取x1的并集
+dplyr::semi_join(a, b, by="x1") # 取x1的交集
+dplyr::anti_join(a, b, by="x1") # 取a与b不同的x1
+  x1 x2
+1  C  3
+
+first <- dplyr::slice(mtcars,1:5)
+second <- dplyr::slice(mtcars,3:8)
+dplyr::intersect(first,second) # 取交集
+dplyr::union_all(first,second) # 取并集
+dplyr::setdiff(first,second) # 取second的补集
