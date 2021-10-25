@@ -1211,3 +1211,64 @@ second <- dplyr::slice(mtcars,3:8)
 dplyr::intersect(first,second) # 取交集
 dplyr::union_all(first,second) # 取并集
 dplyr::setdiff(first,second) # 取second的补集
+
+# P42     选项参数---------------------------------------------------------------------------------------------
+
+1. 输入控制部分
+# 可以输出哪种类型的数据
+# file：接一个文件
+# data：一般指要输入一个数据框
+# x：一个单独的对象，一般是向量，但也可能是矩阵或者列表
+# x和y：函数需要两个输入变量
+# x, y, z：函数需要三个输入变量
+# formula：公式
+# na.rm：是否删除缺失值
+# ...表示参数可传递(与其他函数相同)，或没有数量限制
+# ~ 表示相关
+
+2. 输出控制部分
+# 类似输出
+
+3. 调节部分
+# （1）根据名字判断选项的作用：
+# color选项：控制颜色
+# select 与选择有关
+# font 与字体有关
+# font.axis 坐标轴的字体
+# lty = line type
+# lwd = line width
+# method 软件算法
+
+# （2）选项接受哪些参数：
+# main：字符串，不能是向量
+# na.rm：TRUE or FALSE
+# axis：side参数只能是1到4
+# fig：包含四个元素的向量(控制位置)，不取值可能是NULL或者NA
+# method 参数与算法相关
+
+# P43     数学统计函数------------------------------------------------------------------------------------------
+# R概率分布函数
+      # d 概率密度函数（density）
+      # p 分布函数（distribution）
+      # q 分布函数的反函数（quantum）
+      # r 产生相同分布的随机数（random）
+set.seed(n) # 每次运行可以使之后的随机数相同，n为种子编码
+
+# P44     描述性统计函数-----------------------------------------------------------------------------------------
+1. 描述统计
+summary()
+# 提供向量的各项数据，比如最大小值、平均值、四分位数、因子频数向量统计等
+fivenum(myvars$hp)
+# 返回五个数：最小值、四分位数第一、中位数、四分位数第三、最大值
+describe (Hmisc) 
+stat.desc (pastecs) # basic = T 计算基本值，desc = T 计算描述值，norm = T 计算统计值
+describe(psych) # trims=0.1，去掉最低和最高10%的部分（切尾均值）
+
+2. 分类统计
+aggregate(MASS) # 按条件分类进行描述统计，可以按多个变量进行分类,但只能使用一个统计函数
+aggregate(Cars93[c("Min.Price","Price","Max.Price","MPG.city")],by = list(Manufacturer=Cars93$Manufacturer,Origin=Cars93$Origin),summary)
+summaryBy(doBy) # FUN可以是c(mean,sum)的形式
+summaryBy(x2+x3~x1,data=X,FUN = sd)
+describeBy(psych) # 没办法使用自定义的函数
+describeBy(mtcars[myvars], list(am=mtcars$am))
+describeBy(psych)
