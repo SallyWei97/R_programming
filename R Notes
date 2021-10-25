@@ -1131,6 +1131,7 @@ heatmap(scale(x = state.x77,center = T,scale = T))
 
 P38-40 reshape2，tidyr，dplyr ------------------------------------------------------------------------------------------------
 
+1. reshape2
 # merge 合并同类项
 x <- data.frame(k1=c(NA,NA,3,4,5),k2=c(1,NA,NA,4,5),data=1:5)
 y <- data.frame(k1=c(NA,2,NA,4,5),k2=c(NA,NA,3,4,5),data=1:5)
@@ -1143,3 +1144,21 @@ melt(airquality) #融合数据，将宽数据变为长数据
 aql <- melt(airquality,id.vars = c("month","day")) #以月份+日期作为id
 aqw <- dcast(data = aql,formula = month+day~variable) # 长变宽：month+day作为id，variable列的各个factor作为新的列名
 aqw <- dcast(aql,formula = month ~variable,fun.aggregate = sum,na.rm=T) # 以month为id汇总，值为各个day的求和
+
+2. tidyr
+# 揉数据gather 
+tdata <- mtcars[1:10,1:3]
+tdata <- data.frame(names=rownames(tdata),tdata)
+gather(tdata,key = "KEY",value = "VALUE",mpg:disp)
+# 宽变长
+gdata <- gather(tdata,key = "KEY",value = "VALUE",mpg:disp)
+spread(gdata, key = "KEY", value = "VALUE")
+# 长变宽
+
+# 分列及合并
+df <- data.frame(x=c(NA,"a.b","a.c","b.a"))
+separate(df,col = x,into = c("A","B")) # 默认识别分隔符
+df2 <- data.frame(x=c(NA,"a.b-c","a-c","b-a"))
+separate(df2,col = x,into = c("A","B"),sep="-") # 指定分隔符
+x <- separate(df2,col = x,into = c("A","B"),sep="-")
+unite(x,col = "AB", A,B,sep = "+") #指定连接符，合并
