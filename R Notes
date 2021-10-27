@@ -1296,3 +1296,17 @@ prop.table(x, 1) #按行的总和计算频率
 3. 三维
 y <- xtabs(~ Treatment + Improved + Sex, data = Arthritis)
 ftable(y) # 平铺式的列联表
+
+# P46     独立性检验函数-------------------------------------------------------------------------------------------
+
+1. 卡方检验
+mytable <- table(Arthritis$Treatment, Arthritis$Improved) # 变量的顺序不重要
+chisq.test(mytable)
+
+2. 费希尔精确检验
+mytable <- xtabs(~Treatment+Improved, data=Arthritis) 
+fisher.test(mytable)
+
+3. CMH检验
+mytable <- xtabs(~Treatment+Improved+Sex, data=Arthritis) # 变量的顺序很重要（因为要三个变量）
+mantelhaen.test(mytable)
