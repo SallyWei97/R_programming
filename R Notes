@@ -1272,3 +1272,27 @@ summaryBy(x2+x3~x1,data=X,FUN = sd)
 describeBy(psych) # 没办法使用自定义的函数
 describeBy(mtcars[myvars], list(am=mtcars$am))
 describeBy(psych)
+
+# P45     频数统计函数-------------------------------------------------------------------------------------------
+
+1. 一维
+table() 频数
+mtcars$cyl <- as.factor(mtcars$cyl)
+cut(mtcars$mpg,c(seq(10,50,10)))
+table(mtcars$cyl)
+table(cut(mtcars$mpg,c(seq(10,50,10))))
+prop.table() 频率
+prop.table(table(mtcars$cyl))
+
+2. 二维 vcd包
+table(Arthritis$Treatment, Arthritis$Improved)
+with(data=Arthritis, table(Treatment, Improved)) # 使用with避免重复输入数据集名称
+x <- xtabs(~ Treatment + Improved, data = Arthritis)
+margin.table(x, 1) #边际频数
+prop.table(x, 1) #按行的总和计算频率
+# 1 = 只添加行
+# 2 = 只添加列
+
+3. 三维
+y <- xtabs(~ Treatment + Improved + Sex, data = Arthritis)
+ftable(y) # 平铺式的列联表
