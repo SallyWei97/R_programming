@@ -1324,3 +1324,4 @@ cor(x, y)
 
 # partial correlations 偏相关系数
 pcor(c(1,5,2,3,6), cov(state.x77)) # 偏相关系数的计算需要用到cov协方差
+
