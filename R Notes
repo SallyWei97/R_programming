@@ -1310,3 +1310,17 @@ fisher.test(mytable)
 3. CMH检验
 mytable <- xtabs(~Treatment+Improved+Sex, data=Arthritis) # 变量的顺序很重要（因为要三个变量）
 mantelhaen.test(mytable)
+
+# P47     相关性分析函数--------------------------------------------------------
+# 使用cor()计算相关系数
+cor(state.x77) # 默认method="pearson"
+cor(state.x77, method="spearman")
+# 使用cov()计算协方差
+cov(state.x77) 
+# 计算部分元素的相关系数
+x <- state.x77[, c(1,2,3,6)]
+y <- state.x77[, c(4,5)]
+cor(x, y)
+
+# partial correlations 偏相关系数
+pcor(c(1,5,2,3,6), cov(state.x77)) # 偏相关系数的计算需要用到cov协方差
