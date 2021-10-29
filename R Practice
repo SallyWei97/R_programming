@@ -426,3 +426,141 @@ leaders %>%
 leaders %>% 
   summarise(y= mean(war.diff[success == 0]))
 ```
+# 70011 week 5 --------------------------------------------------------------------------------------------------
+# pratcical lab
+---
+title: "lab05"
+author: "zheng wei"
+date: "2021/10/28"
+output: html_document
+---
+0. install packages
+```{r}
+pacman::p_load(textstem, dplyr, textreadr, tidytext, tidyverse,
+wordcloud)
+pacman::p_load(ggplot2, httr, PKI, RColorBrewer, rmarkdown,
+ROAuth, SentimentAnalysis, SnowballC, tm, twitteR, wordcloud)
+```
+1. capture/read/save
+```{r}
+df <-
+'https://www.washingtonpost.com/wp-srv/national/longterm/unabomber/manifesto.text.htm' %>%
+download() %>% # download data
+read_document() # read data
+save(df,file = "manifesto.txt") # cannot use 'write' to save character object.
+head(df) 
+tail(df, n = 10)
+```
+2. Data processing
+```{r}
+df <- df[-1:-5]
+head(df, n = 3)
+df <- df[-315:-321]
+tail(df, n = 3) # delete the columns
+df <- iconv(df, 'utf-8', 'ascii', sub = '') # change the form from utf-8 to ascii, change characters who cannot be identified into '' 
+head(df, n = 1) 
+tail(df, n = 1)
+df <- gsub("\\n", "", df) # delete the'\n'
+tail(df)
+text_df <- tibble(text = df) # tidy the data(a new data frame)
+text_df <-
+  text_df %>%
+    unnest_tokens(word, text) %>% # split the text into word
+      anti_join(stop_words) # get rid of stop words
+numbers <- text_df %>%
+  filter(str_detect(word, "[0-9]")) %>% 
+  # str_detect: estimate if an element exists(T/F)
+  # "[0-9]"--Regular expression：select all the word which has 0-9
+    select(word) %>% # select according to the estimate results
+      unique() # remove duplicates
+text_df <- text_df %>%
+  anti_join(numbers, by = "word")  #get rid of 'numbers'
+```
+3. Data analysis
+```{r}
+freq_words <- text_df %>%
+  count(word, sort = TRUE) # count():need to specify a data frame so can count columns(there should set a colname)
+ggplot(freq_words, aes(n/sum(n) ) ) + # aes(1,2) 1 means the axis, 1 means the yaxis
+  geom_histogram(show.legend = FALSE, bins = 40) # bins: number of bins
+freq_rank <- freq_words %>%
+  mutate(rank = row_number(),'frequency' = n/sum( n ) ) # mutate: add a new variable into exist data set
+  # row_number: rank functions(only rank according to 'numeric')
+```
+4. Data drawing(bar)
+```{r}
+freq_rank %>%
+  filter(rank < 20) %>% # extract the data if their rank<20
+    ggplot(aes(x = reorder(word, -rank), y = frequency ) ) + # reorder: sort the first variable in positive order according to the second variable
+      geom_bar(stat = "identity") + # 'identity': the height of the bar indicates the value of the data data(y=?is essential)
+        xlab("Words") +
+          ylab("Count") +
+            coord_flip() # Reversing the xy axis
+```
+5. Data drawing(cloud)
+```{r}
+freq_rank <- freq_rank %>%
+  group_by(word) %>%
+    mutate(count = sum(n) ) # maybe meaningless operation?
+freq_rank %>%
+  with(wordcloud(word, count,  
+    min.freq = 25, # the min frequency of words in the words cloud
+    max.words = 50, # the max number of words in the words cloud
+    random.order = TRUE,
+    colors = brewer.pal(8, "Blues") # use 'brewer.pal.info' to check the all color set
+                )
+      )
+```
+6. Data Lemmatizing词形还原
+```{r}
+lemma <- textstem::lemmatize_strings(freq_words$word,dictionary = lexicon::hash_lemmas) # Default Lemma Dictionary
+lemma_dictionary <- make_lemma_dictionary(x, engine = 'hunspell') # Hunspell Lemma Dictionary
+lemma <- lemmatize_strings(text_df$word, dictionary = lemma_dictionary) # cannot use freq_words, because it was counted
+glimpse(lemma)
+lemma <- as.data.frame(lemma)
+colnames(lemma) <- "word" # for further count
+```
+7. remove stop_words/numbers(Prevent them from reappearing after Lemmatizing)
+```{r}
+data(stop_words) # load the data set of 'stop_words'
+head(stop_words)
+lemma <-
+  lemma %>%
+    subset(!lemma %in% stop_words$word) # extract words that do not contain stop_words
+# use the function filter will report an error
+numbers <- lemma %>%
+  filter(str_detect(word, "[0-9]")) %>% 
+    select(word) %>% 
+      unique() 
+lemma <- lemma %>%
+  anti_join(numbers, by = "word") 
+```
+9. corpus processing(语料库)
+```{r}
+freq_words2 <- lemma %>%
+  count(word, sort = TRUE) # count():need to specify a data frame so can count columns(there should set a colname)
+freq_rank2 <- freq_words2 %>%
+  mutate(rank = row_number(),
+    'frequency' = n/sum( n ) )
+freq_rank2
+```
+10. corpus word cloud
+```{r}
+freq_rank2 %>%
+  with(wordcloud(word, n,  
+    min.freq = 25, # the min frequency of words in the words cloud
+    max.words = 50, # the max number of words in the words cloud
+    random.order = TRUE,
+    colors = brewer.pal(8, "PuBu") # use 'brewer.pal.info' to check the all color set
+                )
+      )
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+# optional lab
