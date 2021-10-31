@@ -1338,3 +1338,28 @@ pcor.test(x, 3, 50) # 3 -> 控制变量数，50 -> 样本数
 library(MASS)
 t.test(UScrime) # 单样本t检验
 t.test(Prob ~ So, data=UScrime) # 两独立样本t检验，根据So分2组进行t检验，原假设为南北无差别
+
+
+# P49     绘图函数-----------------------------------------------------------------------------------------------------
+
+#1. R基础绘图包graphics
+# 高级绘图：一步到位，直接绘制出图
+# 低级绘图：不能单独使用，得在高级绘图产生图形的基础上，对图形进行调整，比如加线、标题文字等
+# 输入数据的格式： 散点图：x和y两个坐标数据；直方图📊：因子；热力图：数据矩阵
+
+1.1 plot
+plot(mtcars$cyl) # 散点图
+plot(as.factor(mtcars$cyl)) # 直方图
+plot(as.factor(mtcars$cyl), mtcars$carb) # 箱线图
+plot(mtcars$carb, as.factor(mtcars$cyl)) # 散列图
+plot(as.factor(mtcars$cyl), as.factor(mtcars$carb)) # 棘柱图
+
+ps：plot(women$height ~ women$weight) # 另一种写法
+
+fit <-lm(height ~ weight, data=women)
+plot(fit) # plot会自动检测输入的数据类型来进行不同的绘图
+methods(plot) # 因为plot内含多种子函数(格式)
+
+2.par
+par() # 输出绘图各个参数
+plot(as.factor(mtcars$cyl), col=c("red", "green", "blue")) # col为par的其中一项参数
