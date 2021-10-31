@@ -1311,7 +1311,7 @@ fisher.test(mytable)
 mytable <- xtabs(~Treatment+Improved+Sex, data=Arthritis) # 变量的顺序很重要（因为要三个变量）
 mantelhaen.test(mytable)
 
-# P47     相关性分析函数--------------------------------------------------------
+# P47-48     相关性分析及检验--------------------------------------------------------------------------------------
 # 使用cor()计算相关系数
 cor(state.x77) # 默认method="pearson"
 cor(state.x77, method="spearman")
@@ -1324,4 +1324,17 @@ cor(x, y)
 
 # partial correlations 偏相关系数
 pcor(c(1,5,2,3,6), cov(state.x77)) # 偏相关系数的计算需要用到cov协方差
+# 计算state.x77第1，5变量之间的偏相关系数，2,3,6作为控制变量
 
+# 相关性检验
+cor.test(state.x77[,3], state.x77[,5])
+corr.test(state.x77) #输出相关系数及p值
+
+# 偏相关性检验
+x <- pcor(c(1,5,2,3,6), cov(state.x77)) # 先得到偏相关系数
+pcor.test(x, 3, 50) # 3 -> 控制变量数，50 -> 样本数
+
+# t检验
+library(MASS)
+t.test(UScrime) # 单样本t检验
+t.test(Prob ~ So, data=UScrime) # 两独立样本t检验，根据So分2组进行t检验，原假设为南北无差别
