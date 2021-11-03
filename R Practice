@@ -563,4 +563,314 @@ freq_rank2 %>%
 
 ```
 
-# optional lab
+# lab 2.0
+---
+title: "week5 lab2.0"
+author: "zheng wei"
+date: "2021/11/2"
+output: html_document
+---
+0. install packages
+```{r}
+pacman::p_load(janitor, SnowballC, textdata, textreadr,tidytext, tidyverse, topicmodels, wordcloud, dplyr)
+```
+0.1 similar process
+```{r}
+df <-
+'https://www.washingtonpost.com/wp-srv/national/longterm/unabomber/manifesto.text.htm' %>%
+download() %>% # download data
+read_document() # read data
+save(df,file = "manifesto.txt") # cannot use 'write' to save character object.
+head(df) 
+tail(df, n = 10)
+df <- df[-1:-5]
+head(df, n = 3)
+df <- df[-315:-321]
+tail(df, n = 3) # delete the columns
+df <- iconv(df, 'utf-8', 'ascii', sub = '') # change the form from utf-8 to ascii, change characters who cannot be identified into '' 
+head(df, n = 1) 
+tail(df, n = 1)
+df <- gsub("\n", "", df) # delete the'\n'
+tail(df)
+```
+
+```{r}
+text <- tibble(text = df) # tidy the data(a new data frame)
+```
+1. data cleaning
+```{r}
+text <-
+  text %>%
+    mutate(chapter = # mutate: add a new column
+      cumsum(str_detect( # cumsum: counter T/F
+      # str_detect: estimate if an element exists(T/F)
+      text, "^[A-Z]{2,}") # :upper: = A-Z
+          ) ) 
+# in order to divide them in to chapters(which has 2 upper)
+```
+```{r}
+## Now ensure that each row has only 1 word
+text_df <- # Create an object called text_df
+  text %>% # Using this object
+    unnest_tokens(word, text) %>% # split the text into word
+      anti_join(stop_words) %>% # Merge without stop_words
+        mutate(stem = wordStem(word)) # Stemming using 'SnowballC' package
+```
+1.1 similar process
+```{r}
+numbers <- 
+  text_df %>%
+  filter(str_detect(word, "[0-9]")) %>% 
+  # str_detect: estimate if an element exists(T/F)
+  # "[0-9]"--Regular expression：select all the word which has 0-9
+    select(word) %>% # select according to the estimate results
+      unique() # remove duplicates
+text_df <- text_df %>%
+  anti_join(numbers, by = "word")  #get rid of 'numbers'
+freq_words <- text_df %>%
+  count(word, sort = TRUE) # count():need to specify a data frame so can count columns(there should set a colname)
+freq_words
+```
+2 rank stemmed words
+```{r}
+freq_stems <- text_df %>%
+  count(stem, sort = TRUE)
+freq_stems
+```
+3.1 similar drawing
+```{r}
+ggplot(freq_words, aes(n/sum(n) ) ) + # Plot each word / total words
+  geom_density(show.legend = FALSE,
+    fill = "lightblue")
+```
+3 drawing
+```{r}
+freq_stems <- freq_stems %>%
+  mutate(rank = row_number(), # mutate adds columns 'rank' & 'rate'
+    rate = n/sum( n ) * 100 )
+freq_stems %>%
+  filter(rank <= 20) %>% # Show top 20 terms (can change if desired)
+    ggplot(aes(x = reorder(stem, -rank), y = rate ) ) +
+      geom_bar(stat = "identity") +
+      xlab("Stemmed Words") +
+      ylab("Rate (per 100 words)") +
+      coord_flip()
+```
+4. word cloud
+```{r}
+freq_stems %>% # Use this data
+  with(wordcloud(stem, n, # Apply function to 'word' with `n` counts
+    min.freq = 25, # Min occurrence of a given term
+    max.words = 50, # Max terms to display
+    random.order = TRUE, # Don't sort based on word frequency
+    colors = brewer.pal(8, "Dark2") # Change the colours
+                )
+       )
+```
+5. sentiment analysis
+```{r}
+freq_words <- inner_join(freq_words,get_sentiments("bing"))
+freq_words <- inner_join(freq_words,get_sentiments("afinn"))
+summary(freq_words$value)
+
+## Weighted afinn sentiment (to account for differential use)
+freq_words <-
+  freq_words %>%
+  mutate(rate = n/sum( n ) * 100 , # for weighting
+  wt.value = (value * rate) )
+summary(freq_words$wt.value)
+```
+6. Topic modeling
+```{r}
+## Add a frequency count of stems to the data
+text_df <-
+  text_df %>%
+    group_by(stem) %>% # Group by stem
+      mutate(n = n() ) %>% # n(): gives the current group size
+        ungroup() # Restore the grouped data
+## Document-term matrix
+dtm <- text_df %>%
+  cast_dtm(chapter, stem, n)
+dtm
+```
+6.1 unsupervised machine learning
+```{r}
+tm.2 <- dtm %>%
+  LDA(k = 2)
+topics.2 <- tidy(tm.2)
+top.terms.2 <- topics.2 %>%
+  group_by(topic) %>% # Organise by topic
+    slice_max(beta, n = 10) %>% # Find top 10 words
+     ungroup() %>% # Put back to normal (not fundamental)
+      arrange(topic, -beta) # Sort by topic, highest to lowest beta
+```
+```{r}
+## Create the comparison figure
+top.terms.2 %>%
+  mutate(term = reorder_within(term, beta, topic)) %>% 
+  # term=term_topic(因为不同的topic有相同的term)
+    ggplot(aes(beta, term, fill = factor(topic))) + # Color filling according to the topic factor
+      geom_col(show.legend = FALSE) + # Does not show which color represents which factor
+      facet_wrap(~ topic, scales = "free") + # divide Into 2 pics according to topic
+      #scales = "free"：The default scales will put the vertical axis coordinates together
+      scale_y_reordered() # add reordered term to the plot
+```
+6.2 comparison between 2 topics
+```{r}
+phi.ratio.2 <- topics.2 %>%
+  mutate(topic = paste0("topic", topic)) %>% # topic=topic+number
+    pivot_wider(names_from = topic, values_from = beta) %>% # transfer topic into a column
+      filter(topic1 > .001 | topic2 > .001) %>%
+        mutate(log_ratio = log2(topic2 / topic1))
+```
+```{r}
+phi.ratio.2 %>%
+  top_n(20, abs(log_ratio)) %>% # subset the 20 with the largest absolute value
+    ggplot(aes(y = fct_reorder(term, log_ratio), # rank the term according to the value of log_ratio
+      x = log_ratio)) +
+      geom_col() +
+      labs(y = "", x = "log ratio of phi between topic 2 and topic 1 (base 2)")
+```
+
+# lab 3.0
+---
+title: "week5 lab3.0"
+author: "zheng wei"
+date: "2021/11/3"
+output: html_document
+---
+
+1. The Gutenberg Project
+```{r}
+## Loading the gutenbergr package
+pacman::p_load(gutenbergr, janitor, SnowballC, textdata, textreadr,tidytext, tidyverse, topicmodels, wordcloud, dplyr)
+```
+```{r}
+## Download Vol 2 of "Works of E. A. Poe" (2148 is the Gutenberg book ID)
+eapoe_works <- gutenberg_download(2148)
+```
+```{r}
+## Keep only the lines that correspond to the first 12 stories
+eapoe_works <- eapoe_works %>% slice(42:5438)
+## The titles of the stories (as they appear in the volume)
+titles <- c("THE PURLOINED LETTER",
+"THE THOUSAND-AND-SECOND TALE OF SCHEHERAZADE",
+"A DESCENT INTO THE MAELSTROM.",
+"VON KEMPELEN AND HIS DISCOVERY",
+"MESMERIC REVELATION",
+"THE FACTS IN THE CASE OF M. VALDEMAR",
+"THE BLACK CAT.",
+"THE FALL OF THE HOUSE OF USHER",
+"SILENCE—A FABLE",
+"THE MASQUE OF THE RED DEATH.",
+"THE CASK OF AMONTILLADO.",
+"THE IMP OF THE PERVERSE")
+```
+```{r}
+## Build the corpus as a tidy data frame
+eapoe_df <-
+  eapoe_works %>%
+    mutate(story =
+    ifelse(str_detect(text, # 判断text是否存在于后者
+    paste(titles, collapse = "|")), # 为titles加上分隔符，成为一整个字符串
+    text, NA)) %>% # 如果存在，则输出text该行的值(即titles)，否则输出NA
+      fill(story) %>% # 自动填充story的NA值(填充为上一个非NA值)
+        mutate(story = factor(story, levels = unique(story))) # 将story转为因子类型
+```
+2. Data cleaning
+```{r}
+# split into words
+eapoe_df <- tibble(eapoe_df)
+eapoe_df <- eapoe_df %>% 
+  unnest_tokens(word,text) %>%
+    anti_join(stop_words) %>%
+      mutate(stem = wordStem(word))
+```
+```{r}
+# delete numbers
+numbers <- eapoe_df %>%
+  filter(str_detect(word,"[0-9]")) %>%
+    select(word) %>%
+      unique()
+eapoe_df <- eapoe_df %>%
+  anti_join(numbers,by = "word")
+```
+```{r}
+# rank words and stemmed words
+freq_words <- eapoe_df %>%
+  count(word,sort = TRUE)
+freq_stems <- eapoe_df %>%
+  count(stem, sort = TRUE)
+```
+2. frequence drawing
+```{r}
+freq_words %>% ggplot(aes(n/sum(n))) +
+  geom_density(show.legend = FALSE,
+    fill = "lightblue")
+```
+```{r}
+freq_stems <- freq_stems %>%
+  mutate(rate = 100 * n/sum(n), 
+         rank = row_number())
+freq_stems %>% 
+  filter(rank <= 20) %>% 
+      ggplot(aes(x = reorder(stem, -rank), y = rate)) +
+      geom_bar(stat = "identity") +
+      xlab("Stemmed Words") +
+      ylab("Rate (per 100 words)") +
+      coord_flip()
+```
+3. WORD CLOUD
+```{r}
+freq_stems %>% 
+  with(wordcloud(stem,n,
+        min.freq = 20,
+        max.words = 50,
+        random.order = TRUE,
+        colors = brewer.pal(11,"Set3")))
+```
+4. Sentiment Analysis
+```{r}
+# get sentiment
+freq_words <- inner_join(freq_words,get_sentiments("bing"))
+freq_words <- inner_join(freq_words,get_sentiments("afinn"))
+```
+```{r}
+# weighted
+freq_words <- freq_words %>% 
+  mutate(rate = 100* n/sum(n), 
+         wt.value = value * rate)
+summary(freq_words$wt.value)
+```
+5. Topic Modelling
+```{r}
+## Add a frequency count of stems to the data
+eapoe_df <- eapoe_df %>% 
+  group_by(story) %>% 
+    mutate(n = n()) %>% 
+      ungroup()
+dtm <- eapoe_df %>% cast_dtm(story, stem, n)
+# story:documents(like factor),n:value,stem:term.
+```
+```{r}
+# LDA Modeling
+lm.2 <- dtm %>% LDA(k=2)
+```
+```{r}
+# data processing
+topic2 <- tidy(lm.2)
+topic2 <- topic2 %>% 
+  group_by(topic) %>% 
+    slice_max(beta, n = 10) %>% 
+        arrange(topic, -beta)
+```
+```{r}
+# drawing
+topic2 %>% 
+  mutate(term = reorder_within(term, by = beta, within = topic)) %>% 
+    ggplot(aes(beta, term, fill = factor(topic))) +
+    geom_col() +
+    facet_wrap(~ topic, scales = "free") +
+    scale_y_reordered()
+```
+
