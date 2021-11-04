@@ -874,3 +874,211 @@ topic2 %>%
     scale_y_reordered()
 ```
 
+# optional practice
+---
+title: "week5 optional"
+author: "zheng wei"
+date: "2021/11/4"
+output: html_document
+---
+1. preparation
+```{r}
+pacman::p_load(gutenbergr, janitor, SnowballC, textdata, textreadr,tidytext, tidyverse, topicmodels, wordcloud, dplyr, PKI, twitteR, corpus, tm, ggplot2, SentimentAnalysis)
+## Create public and private encryption keys
+rsa.key <- PKI.genRSAkey(bits = 4096L) # Create a pair of encryption keys
+public.key <- PKI.save.key(rsa.key, private = FALSE) # Get your public encryption key
+private.key <- PKI.save.key(rsa.key) # Get your private encryption key
+keys <- list(public.key, private.key) # Store the encryption keys in a list object
+save(keys, file = "encryption_keys.Rdata") # Save the encryption keys in a separate file
+```
+```{r}
+# save API key of twitter
+public.rsa <- PKI.load.key(keys[[1]]) # Load your public encryption key
+api.key <- PKI.encrypt(charToRaw("8fGuIQxkvNCR0j6p6fU799uyJ"), public.rsa)
+api.secret <- PKI.encrypt(charToRaw("JsbB3Kw1EXi7qRrUBvOeHPTwKZgRgviuO4tKPmyg0ZCWyPxbDG"), public.rsa)
+access.token <- PKI.encrypt(charToRaw("1454166138733146113-wy9l1WcaMCNOtWg6ee9L67XF1gO4m8"), public.rsa)
+access.token.secret <- PKI.encrypt(charToRaw("txrtcIfIMa3ERuuJ9169wTmLf2Vc4bRcbKEWrYlhtMwFJ"), public.rsa)
+twitter_keys <- list(api.key, api.secret,
+access.token, access.token.secret) # Store encrypted Twitter keys
+save(twitter_keys, file = "twitter_keys.RData") # Save Twitter keys in a separate file
+```
+```{r}
+# delete secrets from R
+rm(rsa.key, public.key, private.key, public.rsa, api.key, api.secret,
+access.token, access.token.secret) # Remove keys
+clearhistory <- function() { # Create a function to wipe your R history
+  write("", file=".blank")
+  loadhistory(".blank")
+  unlink(".blank")
+}
+## Remove sensitive data from your R History
+## BE AWARE THAT THIS CLEARS ALL OF YOUR HISTORY!
+clearhistory()
+```
+```{r}
+## Authentication
+## USING ENCRYPTION
+## Load your encrypted Twitter API Keys
+load("encryption_keys.RData") # Load your encryption keys
+load("twitter_keys.RData") # Load your encrypted Twitter info.
+## Activate your decrypted Twitter keys and tokens
+private.rsa <- PKI.load.key(keys[[2]]) # Load your public encryption key
+## If R asks, 'use a local file to cache OAuth access credentials between R sessions?'
+## Select '1. Yes'
+twitteR::setup_twitter_oauth(
+rawToChar(PKI.decrypt(twitter_keys[[1]], private.rsa)),
+rawToChar(PKI.decrypt(twitter_keys[[2]], private.rsa)),
+rawToChar(PKI.decrypt(twitter_keys[[3]], private.rsa)),
+rawToChar(PKI.decrypt(twitter_keys[[4]], private.rsa))
+)
+rm(keys, twitter_keys, private.rsa) # Remove keys
+```
+2. Scraping data
+```{r}
+## Scrape Twitter REST data
+## Scrape the last 1,000 tweets from a user 抓单个用户数据
+tw.timeline <- userTimeline("HillaryClinton", n = 1000)
+tw.timeline[1:10]
+```
+```{r}
+## Or, to scrape the last 1,000 tweets about a user (using the @ sign) 抓数据(@该用户)
+tw.user <- searchTwitter('@HillaryClinton', lang = "en", n = 1000)
+```
+```{r}
+## Or, to scrape the last 1,000 tweets using hashtags (in English) 按关键词抓数据
+tw.hashtag <- searchTwitter("HillaryClinton", lang = "en", n=1000)
+tw.hashtag[1:10]
+```
+```{r}
+## Convert tweets to a data frame
+## Note: Substitute your scraped data object for 'tw.timeline' if using a different method
+tweets.df <- twListToDF(tw.timeline) # transfer list into data frame
+head(tweets.df$text)
+```
+3. Data processing
+```{r}
+## Load tweets as raw corpus?? cannot find the function
+  corpus.raw <- tm::VCorpus(tm::VectorSource(tweets.df$text))
+## Remove URLs
+removeURL <- function(x) gsub("http[^[:space:]]*", "", x) # 定义一个将https...替换为空格的函数
+corpus.prep <- tm_map(corpus.raw, content_transformer(removeURL)) # 将corpus.raw中的URL剔除
+## Remove anything else other than English letters or spaces
+removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]]*", "", x)
+corpus.prep <- tm_map(corpus.prep, content_transformer(removeNumPunct))
+## Remove extra whitespace in the data
+corpus.prep <- tm_map(corpus.prep, stripWhitespace) #tm自己的函数不需要content_transformer
+## Make tweets lower case
+corpus.prep <- tm_map(corpus.prep, content_transformer(tolower))
+## Remove stop words
+corpus <- tm_map(corpus.prep, removeWords, stopwords("english"))
+## Reduce words to their root form (if you want to do this)
+corpus.copy <- tm_map(corpus, stemDocument)
+## Create a Term-Document Matrix
+tdm <- TermDocumentMatrix(corpus.copy)
+tdm
+```
+4. Data Drawing
+```{r}
+## Display frequent terms
+(freq.terms <- findFreqTerms(tdm, lowfreq = 20)) # freq>=20
+term.freq <- rowSums(as.matrix(tdm)) # 统计行数其实也就是统计了频数
+term.freq <- subset(term.freq, term.freq >= 6)
+df <- data.frame(term = names(term.freq), freq = term.freq)
+```
+```{r}
+## Create the figure
+ggplot(df, aes(x = term, y = freq)) +
+  geom_bar(stat = "identity", fill = "#7B8B6F") +
+  xlab("Terms") +
+  ylab("Count") +
+  coord_flip()
+```
+```{r}
+## Create a word cloud to visualize tweets
+word.freq <- sort(rowSums(as.matrix(tdm)), decreasing = TRUE)
+  wordcloud(words = names(word.freq),
+            freq = word.freq,
+            min.freq = 6,
+            random.order = FALSE,
+            colors=c("#E0B060","#983028","#EBBDB1"))
+```
+5. Sentiment Analysis(another function)
+```{r}
+## Analyze sentiment of each tweet in dataframe
+## Note that we're using the processed data but with stop words included
+sentiment <- analyzeSentiment(corpus.prep)
+## Print dictionary-based sentiment (using the QDAP dictionary)
+sentiment$SentimentQDAP
+```
+```{r}
+## View tone of each tweet
+tone <- convertToDirection(sentiment$SentimentQDAP)
+# 将连续的情感分数转换为其相应的情感方向。结果是一个有三个级别的因子，分别表示正面、中性和负面的内容
+tone
+```
+```{r}
+## Frequency table of tone
+table(tone)
+## Tweets with highest and lowest sentiment
+corpus.prep[[which.max(sentiment$SentimentQDAP)]]$content # Most positive
+corpus.prep[[which.min(sentiment$SentimentQDAP)]]$content # Most negative
+```
+
+```{r}
+## View summary
+summary(sentiment$SentimentQDAP)
+```
+```{r}
+## Visualize the tone distribution
+hist(scale(sentiment$SentimentQDAP), col = "#C9C0D3", border = "#7A7281")
+```
+```{r}
+## Create a score based on tone (1 = positive, 0 = neutral, -1 = negative)
+response <- ifelse(sentiment$SentimentQDAP > 0, 1,
+  ifelse(sentiment$SentimentQDAP == 0, 0, -1))
+response # Print the response scores
+summary(response)
+```
+```{r}
+## Plot sentiment for tweets
+plotSentiment(sentiment$SentimentQDAP)
+```
+```{r}
+## Compare sentiment depending on dictoinary used
+sentiment.dic <- sentiment[, c("SentimentGI", "SentimentHE", "SentimentLM", "SentimentQDAP")]
+cor(sentiment.dic)
+# cor: 计算correlation
+```
+6. a Twitter Natural Language Processing Function
+```{r}
+## Create a list of stop words for removal
+list <- stopwords("english")
+```
+```{r}
+## Construct regular expression to match full words (not parts)
+pat <- paste0("\\b(", paste0(list, collapse="|"), ")\\b")
+pat
+```
+```{r}
+## Alternative function to clean Twitter data
+clean.text <- function(x)
+{
+x <- tolower(x) # To lower case
+x <- gsub("rt", "", x) # Remove 'rt'
+x <- gsub("@\\w+", "", x) # Remove '@'
+x <- gsub("[[:punct:]]", "", x) # Remove punctuation
+x <- gsub("[[:digit:]]", "", x) # Remove numbers
+x <- gsub("http\\w+", "", x) # Remove 'http' links
+x <- gsub("[ |\t]{2,}", "", x) # Remove tabs
+x <- gsub("^ ", "", x) # Remove leading blank spaces
+x <- gsub(" $", "", x) # Remove ending blank spaces
+x <- gsub(pat, "", x) # Remove stop words
+return(x)
+}
+```
+```{r}
+corpus.nlp <- lapply(corpus.raw, clean.text) # Apply to tweets in the list
+corpus.nlp[[1]] # View processed version
+corpus.raw[[1]][["content"]] # Compare to raw version
+corpus.nlp2 <- tm::VCorpus(tm::VectorSource(corpus.nlp)) # Tell R that it is a corpus
+```
